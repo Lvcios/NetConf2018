@@ -19,28 +19,21 @@ namespace SimpleExcel
 
             using (SpreadsheetDocument spreadsheetDoc = SpreadsheetDocument.Create("CustomersReport_Easy.xlsx", SpreadsheetDocumentType.Workbook))
             {
-                WorkbookPart wBookPart = null;
-                wBookPart = spreadsheetDoc.AddWorkbookPart();
+                WorkbookPart wBookPart = spreadsheetDoc.AddWorkbookPart();
                 wBookPart.Workbook = new Workbook();
                 spreadsheetDoc.WorkbookPart.Workbook.Sheets = new Sheets();
                 Sheets sheets = spreadsheetDoc.WorkbookPart.Workbook.GetFirstChild<Sheets>();
                 WorksheetPart wSheetPart = wBookPart.AddNewPart<WorksheetPart>();
+                
 
                 Columns columns = new Columns();
                 columns.Append(new Column { Width = 30, Min = 1, Max = 8 });
-                
-                string relationshipId = spreadsheetDoc.WorkbookPart.GetIdOfPart(wSheetPart);
-                uint sheetId = 1;
-                if (sheets.Elements<Sheet>().Count() > 0)
-                {
-                    sheetId = sheets.Elements<Sheet>().Select(s => s.SheetId.Value).Max() + 1;
-                }
 
                 Sheet sheet = new Sheet()
                 {
                     Id = spreadsheetDoc.WorkbookPart.GetIdOfPart(wSheetPart),
-                    SheetId = sheetId,
-                    Name = "Hoja_" + sheetId,
+                    SheetId = 1,
+                    Name = "Hoja",
                 };
                 sheets.Append(sheet);
 
@@ -55,7 +48,7 @@ namespace SimpleExcel
                 headerRow.Append(new Cell { DataType = CellValues.String, CellValue = new CellValue { Text = "Cost" } });
                 headerRow.Append(new Cell { DataType = CellValues.String, CellValue = new CellValue { Text = "Quantity" } });
                 headerRow.Append(new Cell { DataType = CellValues.String, CellValue = new CellValue { Text = "Total" } });
-
+                
                 sheetData.AppendChild(headerRow);
 
                 foreach (Customer data in reportData)
@@ -70,7 +63,6 @@ namespace SimpleExcel
                     contentRow.Append(new Cell { DataType = CellValues.Number, CellValue = new CellValue { Text = string.Format("{0}", data.Quantity * data.ItemCost) } });
                     sheetData.AppendChild(contentRow);
                 }
-
             }
         }
     }

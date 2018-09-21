@@ -18,34 +18,30 @@ namespace StyleSheet
 
             using (SpreadsheetDocument spreadsheetDoc = SpreadsheetDocument.Create("CustomersReport_Styled.xlsx", SpreadsheetDocumentType.Workbook))
             {
-                WorkbookPart wBookPart = null;
-                wBookPart = spreadsheetDoc.AddWorkbookPart();
+                WorkbookPart wBookPart = spreadsheetDoc.AddWorkbookPart();
                 wBookPart.Workbook = new Workbook();
+                //Creamos nuevo objeto de hojas
                 spreadsheetDoc.WorkbookPart.Workbook.Sheets = new Sheets();
+                //para facilitar la manipulación del objeto sheets
                 Sheets sheets = spreadsheetDoc.WorkbookPart.Workbook.GetFirstChild<Sheets>();
+
+                //para facilitar el manejo del worksheetpart
                 WorksheetPart wSheetPart = wBookPart.AddNewPart<WorksheetPart>();
 
-
+                //crea parte para estilos
                 WorkbookStylesPart stylesPart = spreadsheetDoc.WorkbookPart.AddNewPart<WorkbookStylesPart>();
-                stylesPart.Stylesheet = StylesheetGenerator.GenerateStyleSheet();
+                stylesPart.Stylesheet = StylesheetGenerator.GenerateStyleSheet(); //método para hoja de estilos
                 stylesPart.Stylesheet.Save();
-
 
                 Columns columns = new Columns();
                 columns.Append(new Column { Width = 30, Min = 1, Max = 8 });
 
-                string relationshipId = spreadsheetDoc.WorkbookPart.GetIdOfPart(wSheetPart);
-                uint sheetId = 1;
-                if (sheets.Elements<Sheet>().Count() > 0)
-                {
-                    sheetId = sheets.Elements<Sheet>().Select(s => s.SheetId.Value).Max() + 1;
-                }
-
+                
                 Sheet sheet = new Sheet()
                 {
                     Id = spreadsheetDoc.WorkbookPart.GetIdOfPart(wSheetPart),
-                    SheetId = sheetId,
-                    Name = "Hoja_" + sheetId,
+                    SheetId = 1,
+                    Name = "Hoja_Con_Estilos",
                 };
                 sheets.Append(sheet);
 
