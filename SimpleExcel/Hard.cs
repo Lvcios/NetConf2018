@@ -14,12 +14,12 @@ namespace SimpleExcel
     {
         public static void CreateExcel()
         {
-            using (SpreadsheetDocument xl = SpreadsheetDocument.Create("CustomerReport_Hard.xlsx", SpreadsheetDocumentType.Workbook))
+            using (SpreadsheetDocument spreadsheetDoc = SpreadsheetDocument.Create("CustomerReport_Hard.xlsx", SpreadsheetDocumentType.Workbook))
             {
                 OpenXmlWriter oxw;
                 List<OpenXmlAttribute> oxa;
-                xl.AddWorkbookPart();
-                WorksheetPart wsp = xl.WorkbookPart.AddNewPart<WorksheetPart>();
+                spreadsheetDoc.AddWorkbookPart();
+                WorksheetPart wsp = spreadsheetDoc.WorkbookPart.AddNewPart<WorksheetPart>();
                 oxw = OpenXmlWriter.Create(wsp);
 
                 oxw.WriteStartElement(new Worksheet());
@@ -43,9 +43,7 @@ namespace SimpleExcel
                 oxw.WriteEndElement();
                 
                 oxw.WriteStartElement(new SheetData());
-                oxa = new List<OpenXmlAttribute>();
-                oxa.Add(new OpenXmlAttribute("r", null, "1"));
-                oxw.WriteStartElement(new Row(), oxa);
+                oxw.WriteStartElement(new Row(), new List<OpenXmlAttribute>());
                 oxa = new List<OpenXmlAttribute>();
                 oxa.Add(new OpenXmlAttribute("t", null, "str"));
 
@@ -59,13 +57,10 @@ namespace SimpleExcel
                 oxw.WriteStartElement(new Cell(), oxa); oxw.WriteElement(new CellValue("Total")); oxw.WriteEndElement();
 
                 oxw.WriteEndElement();
-                var i = 2;
-
+                
                 foreach(Customer customer in Report.GetCustomers())
                 {
-                    oxa = new List<OpenXmlAttribute>();
-                    oxa.Add(new OpenXmlAttribute("r", null, i.ToString()));
-                    oxw.WriteStartElement(new Row(), oxa);
+                    oxw.WriteStartElement(new Row(), new List<OpenXmlAttribute>());
                     oxa = new List<OpenXmlAttribute>();
                     oxa.Add(new OpenXmlAttribute("t", null, "str"));
 
@@ -76,16 +71,14 @@ namespace SimpleExcel
                     oxw.WriteStartElement(new Cell(), oxa); oxw.WriteElement(new CellValue(customer.ItemCost.ToString())); oxw.WriteEndElement();
                     oxw.WriteStartElement(new Cell(), oxa); oxw.WriteElement(new CellValue(customer.Quantity.ToString())); oxw.WriteEndElement();
                     oxw.WriteStartElement(new Cell(), oxa); oxw.WriteElement(new CellValue((customer.Quantity * customer.ItemCost).ToString())); oxw.WriteEndElement();
-
                     oxw.WriteEndElement();
-                    i++;
                 }
 
                 oxw.WriteEndElement();
                 oxw.WriteEndElement();
                 oxw.Close();
 
-                oxw = OpenXmlWriter.Create(xl.WorkbookPart);
+                oxw = OpenXmlWriter.Create(spreadsheetDoc.WorkbookPart);
                 oxw.WriteStartElement(new Workbook());
                 oxw.WriteStartElement(new Sheets());
 
@@ -93,7 +86,7 @@ namespace SimpleExcel
                 {
                     Name = "Sheet1",
                     SheetId = 1,
-                    Id = xl.WorkbookPart.GetIdOfPart(wsp)
+                    Id = spreadsheetDoc.WorkbookPart.GetIdOfPart(wsp)
                 });
 
                 
@@ -102,7 +95,7 @@ namespace SimpleExcel
                 oxw.WriteEndElement();
                 oxw.Close();
 
-                xl.Close();
+                spreadsheetDoc.Close();
             }
         }
     }
