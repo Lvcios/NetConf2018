@@ -23,7 +23,6 @@ namespace Template
             {
                 WorkbookPart wBookPart = null;
                 wBookPart = spreadsheetDoc.WorkbookPart;
-                wBookPart.Workbook = new Workbook();
                 spreadsheetDoc.WorkbookPart.Workbook.Sheets = new Sheets();
                 Sheets sheets = spreadsheetDoc.WorkbookPart.Workbook.GetFirstChild<Sheets>();
 
@@ -35,20 +34,17 @@ namespace Template
 
                 //add Styles
                 WorkbookStylesPart stylesPart = spreadsheetDoc.WorkbookPart.WorkbookStylesPart;
-                //stylesPart.Stylesheet = Styles.GenerateStyleSheet();
+                //stylesPart.Stylesheet = Styles.GenerateStyleSheet(); //ya tiene una hoja de estilos
                 stylesPart.Stylesheet.Save();
 
                 string relationshipId = spreadsheetDoc.WorkbookPart.GetIdOfPart(newWorksheetPart);
 
-                // Get a unique ID for the new worksheet.
-                uint sheetId = 1;
-                if (sheets.Elements<Sheet>().Count() > 0)
-                {
-                    sheetId = sheets.Elements<Sheet>().Select(s => s.SheetId.Value).Max() + 1;
-                }
-
+            
                 // Give the new worksheet a name.
-                Sheet sheet = new Sheet() { Id = spreadsheetDoc.WorkbookPart.GetIdOfPart(newWorksheetPart), SheetId = sheetId, Name = "Customer_Report" + sheetId };
+                Sheet sheet = new Sheet {
+                    Id = spreadsheetDoc.WorkbookPart.GetIdOfPart(newWorksheetPart),
+                    SheetId = 1,
+                    Name = "Customer_Report" };
                 sheets.Append(sheet);
 
                 //get existing sheetData
